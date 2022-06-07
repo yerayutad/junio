@@ -7,5 +7,5 @@ import retrofit2.http.Url
 
 interface APIService {
     @GET("/animals")
-    suspend fun getAnimals(): Call<List<AnimalDataItem>>
+    fun getAnimals(): Call<List<AnimalDataItem>>
 }
