@@ -1,4 +1,4 @@
-package com.yeraydeza.junio
+package com.yeraydeza.junio.data
 
 
 import com.google.gson.annotations.Expose

@@ -7,7 +7,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.yeraydeza.junio.databinding.ActivityMainBinding
+import com.yeraydeza.junio.adapter.AnimalAdapter
+import com.yeraydeza.junio.apiService.APIService
+import com.yeraydeza.junio.data.AnimalDataItem
 import com.yeraydeza.junio.databinding.FragmentAnimalListBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -21,22 +23,22 @@ import retrofit2.converter.gson.GsonConverterFactory
 class AnimalListFragment : Fragment() {
 
     private lateinit var adapter: AnimalAdapter
-    private val animals: MutableList<AnimalDataItem> = mutableListOf()
     private lateinit var binding:FragmentAnimalListBinding
+    private val animals = ArrayList<AnimalDataItem>()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = FragmentAnimalListBinding.inflate(layoutInflater)
+        initRecyclerView()
         getAll()
     }
 
-    private fun initRecyclerView(animals: List<AnimalDataItem>) {
-        binding.recyclerView.apply {
+    private fun initRecyclerView() {
         adapter = AnimalAdapter(animals)
         binding.recyclerView.layoutManager = LinearLayoutManager(context)
         binding.recyclerView.adapter = adapter
-            }
+
     }
 
     override fun onCreateView(
@@ -56,20 +58,14 @@ class AnimalListFragment : Fragment() {
 
     private fun getAll(){
         CoroutineScope(Dispatchers.IO).launch {
-            val call = getRetrofit().create(APIService::class.java)
-            call.getAnimals().enqueue(object : Callback<List<AnimalDataItem>>{
-                override fun onResponse(
-                    call: Call<List<AnimalDataItem>>,
-                    response: Response<List<AnimalDataItem>>
-                ) {
-                    response.body()?.let { initRecyclerView(it) }
-                }
+            val call = getRetrofit().create(APIService::class.java).getAnimals()
+            val pup = call.body()
+            if (call.isSuccessful){
+                animals.clear()
+                animals.addAll(call.body())
+            }else{
 
-                override fun onFailure(call: Call<List<AnimalDataItem>>, t: Throwable) {
-                    Log.d("falla","onfailure")
-                }
-
-            })
+            }
             }
 
         }

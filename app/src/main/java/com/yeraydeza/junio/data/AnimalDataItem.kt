@@ -1,7 +1,6 @@
-package com.yeraydeza.junio
+package com.yeraydeza.junio.data
 
 
-import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
 data class AnimalDataItem(
