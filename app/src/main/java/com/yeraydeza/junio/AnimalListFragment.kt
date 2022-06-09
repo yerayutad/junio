@@ -2,6 +2,7 @@ package com.yeraydeza.junio
 
 import android.os.Bundle
 import android.util.Log
+import android.util.Log.d
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -11,6 +12,7 @@ import com.yeraydeza.junio.adapter.AnimalAdapter
 import com.yeraydeza.junio.apiService.APIService
 import com.yeraydeza.junio.data.AnimalDataItem
 import com.yeraydeza.junio.databinding.FragmentAnimalListBinding
+import com.yeraydeza.junio.model.AnimalsModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -22,23 +24,14 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class AnimalListFragment : Fragment() {
 
-    private lateinit var adapter: AnimalAdapter
-    private lateinit var binding:FragmentAnimalListBinding
-    private val animals = ArrayList<AnimalDataItem>()
+    private lateinit var binding: FragmentAnimalListBinding
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = FragmentAnimalListBinding.inflate(layoutInflater)
-        initRecyclerView()
         getAll()
-    }
-
-    private fun initRecyclerView() {
-        adapter = AnimalAdapter(animals)
-        binding.recyclerView.layoutManager = LinearLayoutManager(context)
-        binding.recyclerView.adapter = adapter
-
     }
 
     override fun onCreateView(
@@ -49,25 +42,39 @@ class AnimalListFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_animal_list, container, false)
     }
 
-    private fun getRetrofit(): Retrofit {
-        return Retrofit.Builder()
-            .baseUrl("http://serveranimalutad-env.eba-zr9dsz3t.eu-west-3.elasticbeanstalk.com/")
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-    }
+    val retrofit = Retrofit.Builder()
+        .baseUrl("http://serveranimalutad-env.eba-zr9dsz3t.eu-west-3.elasticbeanstalk.com/")
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
 
-    private fun getAll(){
+
+    private fun getAll() {
         CoroutineScope(Dispatchers.IO).launch {
-            val call = getRetrofit().create(APIService::class.java).getAnimals()
-            val pup = call.body()
-            if (call.isSuccessful){
-                animals.clear()
-                animals.addAll(call.body())
-            }else{
+            val api = retrofit.create(APIService::class.java)
+            api.getAnimals().enqueue(object : Callback<List<AnimalDataItem>> {
+                override fun onResponse(
+                    call: Call<List<AnimalDataItem>>,
+                    response: Response<List<AnimalDataItem>>
+                ) {
+                   d("d", "name ${response.body()!!}")
+                    showData(response.body()!!)
+                }
 
-            }
-            }
+                override fun onFailure(call: Call<List<AnimalDataItem>>, t: Throwable) {
+                    d("d", "f")
+                }
+
+            })
 
         }
+
     }
+
+    private fun showData(animalDataItem: List<AnimalDataItem>) {
+        binding.rvFragment.apply {
+            binding.rvFragment.layoutManager = LinearLayoutManager(activity)
+            binding.rvFragment.adapter = AnimalAdapter(animalDataItem)
+        }
+    }
+}
 

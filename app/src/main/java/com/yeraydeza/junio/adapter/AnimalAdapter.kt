@@ -1,5 +1,6 @@
 package com.yeraydeza.junio.adapter
 
+import android.util.Log.d
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,36 +11,33 @@ import com.yeraydeza.junio.data.AnimalData
 import com.yeraydeza.junio.data.AnimalDataItem
 import com.yeraydeza.junio.databinding.AnimalItemBinding
 
-class AnimalAdapter(val dataset: ArrayList<AnimalDataItem>):RecyclerView.Adapter<AnimalViewHolder>(){
+class AnimalAdapter(private val dataset: List<AnimalDataItem>):RecyclerView.Adapter<AnimalAdapter.AnimalViewHolder>(){
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AnimalViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
-        return AnimalViewHolder(layoutInflater.inflate(R.layout.animal_item, parent, false))
+        val binding: AnimalItemBinding = AnimalItemBinding.inflate(layoutInflater, parent, false)
+        return AnimalViewHolder(binding)
     }
+
+    override fun getItemCount() = dataset.size
+
 
     override fun onBindViewHolder(holder: AnimalViewHolder, position: Int) {
-        holder.render(dataset[position])
-
+        val animal2 = dataset[position]
+        d("d","name ${animal2.name}")
+        holder.binding.tvName.text = animal2.name
+        holder.binding.tvAge.text = animal2.age.toString()
+        holder.binding.tvKind.text = animal2.kind
+        holder.binding.tvBreed.text = animal2.breed.name
+        holder.bind(animal2.imageUrl)
     }
 
-    override fun getItemCount(): Int = dataset.size
-}
+    class AnimalViewHolder(val binding: AnimalItemBinding):RecyclerView.ViewHolder(binding.root) {
 
-class AnimalViewHolder(view: View):RecyclerView.ViewHolder(view) {
+        fun bind(image:String){
+            Picasso.get().load(image).into(binding.imageView)
+        }
 
-    val binding = AnimalItemBinding.bind(view)
-
-    fun render(animal: AnimalDataItem){
-        binding.tvAge.text = animal.name
-        binding.tvAge.text = animal.age.toString()
-        binding.tvKind.text = animal.kind
-        binding.tvBreed.text = animal.breed.name
-        bind(animal.imageUrl)
-
-    }
-
-    fun bind(image:String){
-        Picasso.get().load(image).into(binding.imageView)
     }
 
 }
