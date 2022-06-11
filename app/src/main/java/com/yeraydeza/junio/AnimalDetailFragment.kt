@@ -1,59 +1,80 @@
 package com.yeraydeza.junio
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.FragmentResultListener
+import com.squareup.picasso.Picasso
+import com.yeraydeza.junio.apiService.APIService
+import com.yeraydeza.junio.data.AnimalDataItem
+import com.yeraydeza.junio.databinding.FragmentAnimalDetailBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import retrofit2.Call
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [AnimalDetailFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class AnimalDetailFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+
+    private lateinit var binding: FragmentAnimalDetailBinding
+    private lateinit var id: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+            id = it.getString(ID).toString()
         }
     }
+
+    val retrofit = Retrofit.Builder()
+        .baseUrl("http://serveranimalutad-env.eba-zr9dsz3t.eu-west-3.elasticbeanstalk.com/")
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        binding = FragmentAnimalDetailBinding.inflate(inflater, container, false)
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_animal_detail, container, false)
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment AnimalDetailFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            AnimalDetailFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        getAnimalsById(id)
+    }
+
+    private fun getAnimalsById(id: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val api = retrofit.create(APIService::class.java).getAnimalsById("/$id")
+            val api2 = api.body()
+            if (api.isSuccessful) {
+                binding.tvNameD.text = api2?.name
+                binding.tvAgeD.text = api2?.age.toString()
+                binding.tvBreedD.text = api2?.breed?.name
+                binding.tvDescD.text = api2?.description
+                binding.tvKindD.text = api2?.kind
+                if (!api2?.imageUrl.isNullOrBlank())
+                    Picasso.get().load(api2?.imageUrl).into(binding.imageView3)
+
             }
+            fun onFailure(call: Call<List<AnimalDataItem>>, t: Throwable) {
+                Log.d("d", "f")
+
+
+            }
+
+        }
+    }
+
+    companion object {
+        const val ID = "id"
     }
 }
