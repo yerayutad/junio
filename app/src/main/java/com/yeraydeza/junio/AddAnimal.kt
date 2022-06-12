@@ -31,13 +31,6 @@ class AddAnimal : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentAddAnimalBinding.inflate(inflater, container, false)
-        val btn = binding.button2
-        btn.setOnClickListener{
-            Log.d("btn", "pulsado")
-            val fragment = AnimalListFragment()
-            val transaction = fragmentManager?.beginTransaction()
-            transaction?.replace(R.id.nav_host_fragment,fragment)?.commit()
-        }
         // Inflate the layout for this fragment
         return binding.root
     }

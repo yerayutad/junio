@@ -23,7 +23,7 @@
         android:label="fragment_animal_detail"
         tools:layout="@layout/fragment_animal_detail" >
         <argument
-            android:name="id"
+            android:name="idAnimal"
             app:argType="string" />
     </fragment>
     <fragment

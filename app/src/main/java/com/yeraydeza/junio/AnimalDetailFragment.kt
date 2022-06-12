@@ -2,6 +2,7 @@ package com.yeraydeza.junio
 
 import android.os.Bundle
 import android.util.Log
+import android.util.Log.d
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -43,38 +44,34 @@ class AnimalDetailFragment : Fragment() {
     ): View? {
         binding = FragmentAnimalDetailBinding.inflate(inflater, container, false)
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_animal_detail, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        d("detail", id)
         getAnimalsById(id)
     }
 
     private fun getAnimalsById(id: String) {
         CoroutineScope(Dispatchers.IO).launch {
-            val api = retrofit.create(APIService::class.java).getAnimalsById("/$id")
+            val api = retrofit.create(APIService::class.java).getAnimalsById("$id")
             val api2 = api.body()
-            if (api.isSuccessful) {
-                binding.tvNameD.text = api2?.name
-                binding.tvAgeD.text = api2?.age.toString()
-                binding.tvBreedD.text = api2?.breed?.name
-                binding.tvDescD.text = api2?.description
-                binding.tvKindD.text = api2?.kind
-                if (!api2?.imageUrl.isNullOrBlank())
-                    Picasso.get().load(api2?.imageUrl).into(binding.imageView3)
-
+            activity?.runOnUiThread {
+                if (api.isSuccessful) {
+                    binding.tvNameD.text = api2?.name
+                    binding.tvAgeD.text = api2?.age.toString()
+                    binding.tvBreedD.text = api2?.breed?.name
+                    binding.tvDescD.text = api2?.description
+                    binding.tvKindD.text = api2?.kind
+                    if (!api2?.imageUrl.isNullOrBlank())
+                        Picasso.get().load(api2?.imageUrl).into(binding.imageView3)
+                }
             }
-            fun onFailure(call: Call<List<AnimalDataItem>>, t: Throwable) {
-                Log.d("d", "f")
-
-
-            }
-
         }
     }
 
     companion object {
-        const val ID = "id"
+        const val ID = "idAnimal"
     }
 }

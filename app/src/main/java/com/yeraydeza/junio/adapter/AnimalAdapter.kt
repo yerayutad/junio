@@ -24,9 +24,20 @@ class AnimalAdapter(
 
     override fun onBindViewHolder(holder: AnimalViewHolder, position: Int) {
         val animal2 = dataset[position]
+        var edadToString : String = ""
         d("d", "name ${animal2.name}")
+        d("d", "age ${animal2.age}")
+
+        if (animal2.age < 1){
+            edadToString += "Cachorro"
+        }else if(animal2.age in 1..6){
+            edadToString += "Adulto"
+        }else{
+            edadToString += "Senior"
+        }
+
         holder.binding.tvName.text = animal2.name
-        holder.binding.tvAge.text = animal2.age.toString()
+        holder.binding.tvAge.text = edadToString
         holder.binding.tvKind.text = animal2.kind
         holder.binding.tvBreed.text = animal2.breed.name
         holder.bind(animal2.imageUrl)

@@ -1,15 +1,13 @@
 package com.yeraydeza.junio
 
 import android.os.Bundle
-import android.util.Log
 import android.util.Log.d
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.yeraydeza.junio.adapter.AnimalAdapter
 import com.yeraydeza.junio.apiService.APIService
@@ -51,9 +49,8 @@ class AnimalListFragment : Fragment() {
         val btn = binding.button
         btn.setOnClickListener{
             d("btn","pulsado")
-            val fragment = AddAnimal()
-            val transaction = fragmentManager?.beginTransaction()
-            transaction?.replace(R.id.nav_host_fragment,fragment)?.commit()
+            val action = AnimalListFragmentDirections.actionAnimalListFragmentToAddAnimal()
+            view?.findNavController()?.navigate(action)
         }
         // Inflate the layout for this fragment
         return binding.root
@@ -100,10 +97,10 @@ class AnimalListFragment : Fragment() {
             rv.adapter = AnimalAdapter(animalDataItem) { animal ->
                 d("MainActivity", "animal pulsado: ${animal.id}")
                 animalID = animal.id
-                val fragment = AnimalDetailFragment()
-                val transaction = fragmentManager?.beginTransaction()
-                transaction?.replace(R.id.nav_host_fragment,fragment)?.commit()}
-        }
+                val action = AnimalListFragmentDirections.actionAnimalListFragmentToAnimalDetailFragment(idAnimal = animalID)
+                view?.findNavController()?.navigate(action)
+            }
     }
 }
+    }
 
