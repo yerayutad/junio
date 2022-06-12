@@ -9,10 +9,10 @@ interface APIService {
     @GET("animals")
     fun getAnimals(): Call<List<AnimalDataItem>>
 
-    @POST("animals")
-    fun postAnimals(@Body animalData: AnimalDataItem): Call<AnimalDataItem>
-
     @GET("animals/{idAnimal}")
     suspend fun getAnimalsById(@Path("idAnimal") id: String): Response<AnimalDataItem>
+
+    @POST("animals")
+    fun postAnimals(@Body animalData: AnimalDataItem): Call<AnimalDataItem>
 }
 

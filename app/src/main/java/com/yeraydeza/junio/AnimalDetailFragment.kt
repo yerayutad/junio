@@ -66,6 +66,9 @@ class AnimalDetailFragment : Fragment() {
                     binding.tvKindD.text = api2?.kind
                     if (!api2?.imageUrl.isNullOrBlank())
                         Picasso.get().load(api2?.imageUrl).into(binding.imageView3)
+                    if (api2 != null) {
+                        d("detail", "${api2.id}${api2.name}${api2.age}${api2.breed}${api2.imageUrl}${api2.description}${api2.kind}")
+                    }
                 }
             }
         }
